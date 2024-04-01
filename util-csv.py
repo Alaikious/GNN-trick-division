@@ -1,5 +1,6 @@
 import argparse
 import csv
+import re
 
 import networkx as nx
 import numpy as np
@@ -28,7 +29,14 @@ class S2VGraph(object):
 
 
 def trans(str):  # 转换字符串为浮点数
-    return float(str)
+    try:
+        # 尝试将清理后的字符串转换为浮点数
+        return float(str)
+    except ValueError:
+        try:
+            return float(int(str))
+        except ValueError:
+            return None
 
 
 def load_data(dataset, n_g=0):  # n_g是输入节点数量
@@ -42,15 +50,15 @@ def load_data(dataset, n_g=0):  # n_g是输入节点数量
     print('loading data')
     g_list = []
     n = 81  # 共81个元素
-    l = 80  # label位于第81个元素
+    l = 81  # label位于第81个元素
 
     with open('dataset/%s.csv' % dataset, 'r') as f:
         for cf in f:
             g = nx.Graph()
-            node_tags = [trans(cf[l])]
+            node_tags = [trans(cf[len(cf) - 1])]
             node_features = []
             n_edges = 0
-            for j in range(n):
+            for j in range(n - 1):
                 g.add_node(j)
                 attr = trans(cf[j])
                 node_features.append(attr)
@@ -116,10 +124,9 @@ def separate_data(graph_list, seed, fold_idx):
     return train_graph_list, test_graph_list
 
 
-""" # 测试用例
 parser = argparse.ArgumentParser(
     description='PyTorch graph convolutional neural net for whole-graph classification')
-parser.add_argument('--dataset', type=str, default="MUTAG",
+parser.add_argument('--dataset', type=str, default="translate_list",
                     help='name of dataset (default: MUTAG)')
 parser.add_argument('--degree_as_tag', action="store_true",
                     help='let the input node features be the degree of nodes (heuristics for unlabeled graph)')
@@ -127,4 +134,3 @@ args = parser.parse_args()
 graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
 len(graphs)
 print(graphs)
-"""
