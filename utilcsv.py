@@ -53,21 +53,24 @@ def load_data(dataset, n_g=300):  # n_g是输入节点数量
     l = 81  # label位于第81个元素
 
     with open('dataset/%s.csv' % dataset, 'r') as f:
-        for i in range(n_g):
-            cf = f.readline()
+        csv_reader = csv.reader(f)
+
+        for i in range(n):
+            cf = next(csv_reader)
             g = nx.Graph()
-            node_tags = [trans(cf[len(cf) - 1])]
+            node_tags = [int(cf[len(cf) - 1])]
             node_features = []
+            label = int(cf[len(cf) - 1])
             n_edges = 0
             for j in range(n - 1):
                 g.add_node(j)
                 attr = trans(cf[j])
                 node_features.append(attr)
-                for k in range(0, n - 1):
+                for k in range(0, n - 2):
                     g.add_edge(j, k)
             node_features = np.stack(node_features)
             node_feature_flag = True
-            g_list.append(S2VGraph(g, l, node_tags, node_features))
+            g_list.append(S2VGraph(g, label, node_tags, node_features))
 
     # add labels and edge_mat
     for g in g_list:
@@ -80,8 +83,6 @@ def load_data(dataset, n_g=300):  # n_g是输入节点数量
             g.neighbors[i] = g.neighbors[i]
             degree_list.append(len(g.neighbors[i]))
         g.max_neighbor = max(degree_list)
-
-        g.label = g.node_tags
 
         edges = [list(pair) for pair in g.g.edges()]
         edges.extend([[i, j] for j, i in edges])

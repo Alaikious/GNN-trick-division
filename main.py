@@ -9,7 +9,8 @@ from tqdm import tqdm
 from models.SVM import SVM
 from models.graphcnn import GraphCNN
 from models.randomForest import RandomForestMLP
-from util import load_data, separate_data
+# from util import load_data, separate_data
+from utilcsv import load_data, separate_data
 
 criterion = nn.CrossEntropyLoss()
 
@@ -88,7 +89,7 @@ def main():
     # Note: Hyper-parameters need to be tuned in order to obtain results reported in the paper.
     parser = argparse.ArgumentParser(
         description='PyTorch graph convolutional neural net for whole-graph classification')
-    parser.add_argument('--dataset', type=str, default="MUTAG",
+    parser.add_argument('--dataset', type=str, default="translate_list",  # 设置 dataset MUTAG or translate_list
                         help='name of dataset (default: MUTAG)')
     parser.add_argument('--device', type=int, default=0,
                         help='which gpu to use if any (default: 0)')
@@ -131,16 +132,19 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
 
-    graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
+    # graphs, num_classes = load_data(args.dataset, args.degree_as_tag)  # data load MUTAG运行源
+
+    graphs, num_classes = load_data(args.dataset), 1  # data load translate_list运行源
 
     ##10-fold cross validation. Conduct an experiment on the fold specified by args.fold_idx.
     train_graphs, test_graphs = separate_data(graphs, args.seed, args.fold_idx)
 
-    #    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim,
-    #                     num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type,
-    #                     args.neighbor_pooling_type, device).to(device)
+    # 原模型
+    model = GraphCNN(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1], args.hidden_dim,
+                     num_classes, args.final_dropout, args.learn_eps, args.graph_pooling_type,
+                     args.neighbor_pooling_type, device).to(device)
 
-    model = SVM(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1]).to(device)
+    # model = SVM(args.num_layers, args.num_mlp_layers, train_graphs[0].node_features.shape[1]).to(device) #测试用别的模型
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
