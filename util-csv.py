@@ -39,7 +39,7 @@ def trans(str):  # 转换字符串为浮点数
             return None
 
 
-def load_data(dataset, n_g=0):  # n_g是输入节点数量
+def load_data(dataset, n_g=300):  # n_g是输入节点数量
 
     """
         dataset: name of dataset
@@ -53,7 +53,8 @@ def load_data(dataset, n_g=0):  # n_g是输入节点数量
     l = 81  # label位于第81个元素
 
     with open('dataset/%s.csv' % dataset, 'r') as f:
-        for cf in f:
+        for i in range(n_g):
+            cf = f.readline()
             g = nx.Graph()
             node_tags = [trans(cf[len(cf) - 1])]
             node_features = []
@@ -100,7 +101,6 @@ def load_data(dataset, n_g=0):  # n_g是输入节点数量
         g.node_features = torch.zeros(len(g.node_tags), len(tagset))
         g.node_features[range(len(g.node_tags)), [tag2index[tag] for tag in g.node_tags]] = 1
 
-    print('# classes: %d' % len(label_dict))
     print('# maximum node tag: %d' % len(tagset))
 
     print("# data: %d" % len(g_list))
@@ -131,6 +131,6 @@ parser.add_argument('--dataset', type=str, default="translate_list",
 parser.add_argument('--degree_as_tag', action="store_true",
                     help='let the input node features be the degree of nodes (heuristics for unlabeled graph)')
 args = parser.parse_args()
-graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
-len(graphs)
-print(graphs)
+graphs = load_data(args.dataset)
+
+print(graphs.pop())
