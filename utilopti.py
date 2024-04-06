@@ -5,6 +5,18 @@ import torch
 from sklearn.model_selection import StratifiedKFold
 import argparse
 
+'''
+file:
+    utilopti
+class:
+    S2VGraph
+def:
+    load_data
+    separate_data
+description:
+    已弃用
+'''
+
 
 class S2VGraph(object):
     def __init__(self, g, label, node_tags=None, node_features=None):

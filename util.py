@@ -6,6 +6,18 @@ import random
 import torch
 from sklearn.model_selection import StratifiedKFold
 
+'''
+file:
+    util
+class:
+    S2VGraph
+def:
+    load_data
+    separate_data
+description:
+    原库
+'''
+
 
 class S2VGraph(object):
     def __init__(self, g, label, node_tags=None, node_features=None):
@@ -144,13 +156,3 @@ def separate_data(graph_list, seed, fold_idx):
     return train_graph_list, test_graph_list
 
 
-parser = argparse.ArgumentParser(
-    description='PyTorch graph convolutional neural net for whole-graph classification')
-parser.add_argument('--dataset', type=str, default="MUTAG",
-                    help='name of dataset (default: MUTAG)')
-parser.add_argument('--degree_as_tag', action="store_true",
-                    help='let the input node features be the degree of nodes (heuristics for unlabeled graph)')
-args = parser.parse_args()
-graphs, num_classes = load_data(args.dataset, args.degree_as_tag)
-len(graphs)
-print(graphs)
